@@ -3,6 +3,7 @@ from agents.testing_agent import TestingAgent
 from agents.research_agent import ResearchAgent
 from memory.conversation_memory import ConversationMemory
 from orchestrator.llm_router import LLMRouter
+from workflows.coding_workflow import CodingWorkflow
 
 class AgentRouter:
     def __init__(self):
@@ -12,6 +13,7 @@ class AgentRouter:
         self.testing_agent = TestingAgent()
         self.research_agent = ResearchAgent()
         self.llm_router = LLMRouter()
+        self.coding_workflow = CodingWorkflow()
 
     async def route(self,user_input:str, session_id:str):
   
@@ -21,22 +23,27 @@ class AgentRouter:
             "user",
             user_input
         )
+        #Retrieve convo memory for context (can be used for better routing decisions and agent responses)
+
         conversation_history = self.conversation_memory.get_conversation(session_id) 
 
-        #Create a list of possible words for routing
+        # ASK LLMRouter which workflow should handle the request
         selected_agent_name = await self.llm_router.decide_agent(user_input)
 
         if selected_agent_name == "Coding Agent":
             selected_agent = self.coding_agent
+            workflow_response = await self.coding_workflow.run(user_input)
+            final_response = workflow_response
+            system_used = "Coding Workflow"
 
-        elif selected_agent_name == "Testing Agent":
-            selected_agent = self.testing_agent
 
+        
         else:
-            selected_agent = self.research_agent
-  
-        #call the execute function of base agent (call for selected agent n pass the input)
-        response = await selected_agent.execute(user_input)
+            final_response = await selected_agent.execute(user_input)
+            system_used = 'Research Agent'
+
+        # then save into memory the agent response
+        response = await selected_agent_name.execute(user_input)
         #used await because execute is async functon and may take some time to perform its functin
         #in our case , AI Takes time 
 
@@ -45,14 +52,13 @@ class AgentRouter:
         self.conversation_memory.save_message(
             session_id,
             "assistant",
-            response
+            str(final_response)
         )
 
         return {
-            "selected_agent": selected_agent.name,
-            "role": selected_agent.role,
+            "system_used": system_used,
             "conversation_history": conversation_history,
-            "response": response
+            "response": final_response
         }
     #return structured response
 
