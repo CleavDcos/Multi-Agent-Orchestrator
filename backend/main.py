@@ -9,6 +9,7 @@ router = AgentRouter()
 
 
 class UserRequest(BaseModel):
+    session_id:str
     message: str
 
 
@@ -18,6 +19,6 @@ async def root():
 
 @app.post("/chat")
 async def chat(request: UserRequest):
-    response = await router.route(request.message)
+    response = await router.route(request.message, request.session_id)
 
     return response
