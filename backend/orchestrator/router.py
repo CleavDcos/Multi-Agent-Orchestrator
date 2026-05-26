@@ -1,7 +1,7 @@
 from agents.coding_agent import CodingAgent
 from agents.testing_agent import TestingAgent
 from agents.research_agent import ResearchAgent
-from memory.conversation_memory import ConversationMemory
+from backend.memory.redis_memory import ConversationMemory
 from orchestrator.llm_router import LLMRouter
 from workflows.coding_workflow import CodingWorkflow
 
