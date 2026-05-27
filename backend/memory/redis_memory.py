@@ -6,7 +6,7 @@ class RedisMemory:
     def __init__(self):
         #Configure client to communicate with redis server
         self.redis_client = redis.Redis(
-            host='localhost',
+            host='redis',
             port=6379,
             decode_responses=True
         )

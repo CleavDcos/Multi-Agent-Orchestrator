@@ -1,4 +1,24 @@
-.env
-backend/.env
+# Python
 venv/
 __pycache__/
+*.pyc
+
+# Environment variables
+.env
+
+# Node modules
+node_modules/
+
+# Build folders
+dist/
+build/
+
+# VS Code
+.vscode/
+
+# Docker
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db
